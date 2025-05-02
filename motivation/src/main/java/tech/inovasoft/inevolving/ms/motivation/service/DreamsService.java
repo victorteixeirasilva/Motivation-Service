@@ -66,11 +66,12 @@ public class DreamsService {
             return null;
         }
 
+        Dreams dream = dreamOpt.get();
         try {
-            repository.delete(dreamOpt.get());
-            return new ResponseDeleteDream("Sonho deletado!");
+            repository.delete(dream);
+            return new ResponseDeleteDream("Dream deleted! ("+dream+")");
         } catch (Exception e) {
-            throw new DataBaseException("Problema na hora de deletar Sonhos.");
+            throw new DataBaseException("Error when deleting Dreams.");
         }
     }
 }
