@@ -56,8 +56,7 @@ public class DreamsService {
     public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser){
         Optional<Dreams> dreamOpt = repository.findById(idDream);
         if (dreamOpt.isEmpty()){
-            //TODO erro caso não encontre o sonho cujo id foi informado.
-            return null;
+            throw new DreamNotFoundException();
         }
 
         UUID dreamUserId = dreamOpt.get().getIdUser();

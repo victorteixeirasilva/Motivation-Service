@@ -150,7 +150,7 @@ public class DreamsServiceFailureTest {
 
         // When (Quando)
         // Mockando a resposta do repository
-        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         // Then (Então)
         Exception exception = assertThrows(DreamNotFoundException.class, () -> {
