@@ -8,16 +8,20 @@ import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisio
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
+import tech.inovasoft.inevolving.ms.motivation.service.client.GeradorDeVisionBordClientService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.dto.ImageUrl;
+import tech.inovasoft.inevolving.ms.motivation.service.client.dto.RequestGeradorDeVisionBordDTO;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class DreamsService {
 
     @Autowired
     private DreamsRepository repository;
+
+    @Autowired
+    private GeradorDeVisionBordClientService geradorDeVisionBordClientService;
 
     private static final int MAX_DREAMS = 200;
 
@@ -115,12 +119,32 @@ public class DreamsService {
         return dreams;
     }
 
-    private List<Dreams> selectedDreams(List<Dreams> allDreams) {
-        return null;
+    public List<Dreams> selectedDreams(List<Dreams> allDreams) {
+        Collections.shuffle(allDreams);
+        return allDreams.subList(0, 100);
     }
 
-    public ResponseVisionBord generateVisionBordByUserId(UUID idUser){
-        //TODO Fazer primeiro o selectedDreams
-        return null;
+    public ResponseVisionBord generateVisionBordByUserId(UUID idUser) throws DataBaseException, DreamNotFoundException {
+        List<Dreams> allDreams = getDreamsByUserId(idUser);
+        if (allDreams.size() < 100) {
+            throw new DreamNotFoundException("O usuário possui menos de 100 sonhos, impossível gerar Vision Board.");
+        }
+
+        List<Dreams> selectedDreams = selectedDreams(allDreams);
+        List<String> links = new ArrayList<>();
+        for (Dreams dream : selectedDreams){
+            links.add(dream.getUrlImage());
+        }
+
+        String user_id = String.valueOf(idUser);
+        ImageUrl imageUrl = geradorDeVisionBordClientService.gerador(
+                new RequestGeradorDeVisionBordDTO(
+                        user_id, links
+                )
+        );
+
+        return new ResponseVisionBord(imageUrl.image_url());
     }
+
+
 }

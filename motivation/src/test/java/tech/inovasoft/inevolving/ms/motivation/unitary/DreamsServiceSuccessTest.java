@@ -16,6 +16,9 @@ import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
 import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.GeradorDeVisionBordClientService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.dto.ImageUrl;
+import tech.inovasoft.inevolving.ms.motivation.service.client.dto.RequestGeradorDeVisionBordDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,9 @@ public class DreamsServiceSuccessTest {
 
     @Mock
     private DreamsRepository repository;
+
+    @Mock
+    private GeradorDeVisionBordClientService geradorDeVisionBordClientService;
 
     @InjectMocks
     private DreamsService service;
@@ -197,16 +203,17 @@ public class DreamsServiceSuccessTest {
     @Test
     public void generateVisionBordByUserId() throws DataBaseException, DreamNotFoundException {
         // Given (Dado)
-        Dreams dreamMock = new Dreams(
-                UUID.randomUUID(),
-                "Dinheiro",
-                "Ganhar muito dinheiro",
-                "Urldaimagem.com",
-                UUID.randomUUID()
-        );
+        UUID idUser = UUID.randomUUID();
 
         List<Dreams> dreamsMock = new ArrayList<>();
-        for (int i = 1; i <= 200; i++){
+        for (int i = 1; i < 200; i++){
+            Dreams dreamMock = new Dreams(
+                    UUID.randomUUID(),
+                    "Dinheiro",
+                    "Ganhar muito dinheiro",
+                    "Urldaimagem.com",
+                    idUser
+            );
             dreamsMock.add(dreamMock);
         }
 
@@ -214,14 +221,15 @@ public class DreamsServiceSuccessTest {
 
         // When (Quando)
         // Mockando a resposta do repository
-        when(service.getDreamsByUserId(dreamMock.getIdUser())).thenReturn(dreamsMock);
-        ResponseVisionBord visionBordResult = service.generateVisionBordByUserId(dreamMock.getIdUser());
+        when(repository.findAllByUserId(idUser)).thenReturn(dreamsMock);
+        when(service.getDreamsByUserId(idUser)).thenReturn(dreamsMock);
+        when(geradorDeVisionBordClientService.gerador(any(RequestGeradorDeVisionBordDTO.class))).thenReturn(new ImageUrl("urlvisionbord"));
+        ResponseVisionBord visionBordResult = service.generateVisionBordByUserId(idUser);
 
         // Then (Então)
-        //TODO Fazer primeiro o teste de selectedDreams
-//        assertEquals(200, dreamsBd.size());
-//        assertEquals(dreamMock.getIdUser(), dreamsBd.get(120).getIdUser());
-        verify(service, times(1)).getDreamsByUserId(dreamMock.getIdUser());
+        assertEquals(expectedVisionBord.urlVisionBord(), visionBordResult.urlVisionBord());
+//        verify(service, times(1)).getDreamsByUserId(idUser);
+        verify(geradorDeVisionBordClientService, times(1)).gerador(any(RequestGeradorDeVisionBordDTO.class));
     }
 
 
