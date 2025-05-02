@@ -54,7 +54,13 @@ public class DreamsService {
     }
 
     public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser) {
-        Optional<Dreams> dreamOpt = repository.findById(idDream);
+        Optional<Dreams> dreamOpt;
+        try {
+            dreamOpt = repository.findById(idDream);
+        } catch (Exception e) {
+            throw new DataBaseException("Error when getting Dreams.");
+        }
+
         if (dreamOpt.isEmpty()){
             throw new DreamNotFoundException();
         }
@@ -73,7 +79,27 @@ public class DreamsService {
         }
     }
 
-    public Dreams getDreamByID(UUID id, UUID idUser) {
+    public Dreams getDreamByID(UUID idDream, UUID idUser) {
+        Optional<Dreams> dreamOpt;
+        try {
+            dreamOpt = repository.findById(idDream);
+        } catch (Exception e) {
+            throw new DataBaseException("Error when getting Dreams.");
+        }
+
+        if (dreamOpt.isEmpty()){
+            throw new DreamNotFoundException();
+        }
+
+        UUID dreamUserId = dreamOpt.get().getIdUser();
+        if (dreamUserId != idUser){
+            throw new UserWithoutAuthorizationAboutThisDreamException();
+        }
+
+        return dreamOpt.get();
+    }
+
+    public List<Dreams> getDreamsByUserId(UUID idUser){
         return null;
     }
 }

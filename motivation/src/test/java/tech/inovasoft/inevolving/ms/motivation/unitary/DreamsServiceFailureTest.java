@@ -161,6 +161,29 @@ public class DreamsServiceFailureTest {
     }
 
     @Test
+    public void notGetDreamByIdBecauseDreamNotFoundException() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        // Then (Então)
+        Exception exception = assertThrows(DreamNotFoundException.class, () -> {
+            service.getDreamByID(UUID.randomUUID(), dream.getIdUser());
+        });
+
+        verify(repository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
     public void notDeletedDreamBecauseUserWithoutAuthorizationAboutThisDreamException() {
         // Given (Dado)
         Dreams dream = new Dreams(
@@ -178,6 +201,29 @@ public class DreamsServiceFailureTest {
         // Then (Então)
         Exception exception = assertThrows(UserWithoutAuthorizationAboutThisDreamException.class, () -> {
             service.deleteDream(dream.getId(), UUID.randomUUID());
+        });
+
+        verify(repository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    public void notGetDreamByIdBecauseUserWithoutAuthorizationAboutThisDreamException() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+
+        // Then (Então)
+        Exception exception = assertThrows(UserWithoutAuthorizationAboutThisDreamException.class, () -> {
+            service.getDreamByID(dream.getId(), UUID.randomUUID());
         });
 
         verify(repository, times(1)).findById(any(UUID.class));

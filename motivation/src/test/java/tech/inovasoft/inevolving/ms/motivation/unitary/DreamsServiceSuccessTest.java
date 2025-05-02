@@ -76,7 +76,7 @@ public class DreamsServiceSuccessTest {
     }
 
     @Test
-    public void updateDreamOk() throws UserWithoutAuthorizationAboutThisDreamException {
+    public void updateDreamOk() {
         // Given (Dado)
         Dreams dream = new Dreams(
                 UUID.randomUUID(),
@@ -166,6 +166,33 @@ public class DreamsServiceSuccessTest {
         assertEquals(dream.getDescription(), dreamBd.getDescription());
         assertEquals(dream.getUrlImage(), dreamBd.getUrlImage());
         verify(repository, times(1)).findById(dream.getId());
+    }
+
+    @Test
+    public void getDreamsByUserIdOk(){
+        // Given (Dado)
+        Dreams dreamMock = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        List<Dreams> dreamsMock = new ArrayList<>();
+        for (int i = 1; i <= 200; i++){
+            dreamsMock.add(dreamMock);
+        }
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findAllByUserId(dreamMock.getIdUser())).thenReturn(dreamsMock);
+        List<Dreams> dreamsBd = service.getDreamsByUserId(dreamMock.getIdUser());
+
+        // Then (Então)
+        assertEquals(200, dreamsBd.size());
+        assertEquals(dreamMock.getIdUser(), dreamsBd.get(120).getIdUser());
+        verify(repository, times(1)).findAllByUserId(dreamMock.getIdUser());
     }
 
 
