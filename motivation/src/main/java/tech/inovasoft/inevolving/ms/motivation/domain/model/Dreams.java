@@ -31,4 +31,5 @@ public class Dreams {
         this.urlImage = dto.urlImage();
         this.idUser = dto.idUser();
     }
+
 }
