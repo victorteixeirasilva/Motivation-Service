@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
 
 import java.util.UUID;
 
@@ -24,4 +25,10 @@ public class Dreams {
     private String urlImage;
     private UUID idUser;
 
+    public Dreams(DreamRequestDTO dto) {
+        this.name = dto.name();
+        this.description = dto.description();
+        this.urlImage = dto.urlImage();
+        this.idUser = dto.idUser();
+    }
 }
