@@ -229,4 +229,29 @@ public class DreamsServiceFailureTest {
         verify(repository, times(1)).findById(any(UUID.class));
     }
 
+    @Test
+    public void notGetDreamsByUserIdBecauseDreamNotFoundException() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        List<Dreams> listEmpty = new ArrayList<>();
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findAllByUserId(dream.getIdUser())).thenReturn(listEmpty);
+
+        // Then (Então)
+        Exception exception = assertThrows(DreamNotFoundException.class, () -> {
+            service.getDreamsByUserId(dream.getIdUser());
+        });
+
+        verify(repository, times(1)).findAllByUserId(dream.getIdUser());
+    }
+
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseDeleteDream;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisionBord;
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
@@ -100,6 +101,21 @@ public class DreamsService {
     }
 
     public List<Dreams> getDreamsByUserId(UUID idUser){
+        List<Dreams> dreams;
+        try {
+            dreams = repository.findAllByUserId(idUser);
+        } catch (Exception e) {
+            throw new DataBaseException("Error when getting Dreams.");
+        }
+
+        if (dreams.isEmpty()){
+            throw new DreamNotFoundException("No dreams were found");
+        }
+
+        return dreams;
+    }
+
+    public ResponseVisionBord generateVisionBordByUserId(UUID idUser){
         return null;
     }
 }

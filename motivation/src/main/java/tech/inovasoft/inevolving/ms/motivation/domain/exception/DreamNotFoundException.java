@@ -4,4 +4,8 @@ public class DreamNotFoundException extends RuntimeException{
     public DreamNotFoundException() {
         super("Não foi possível localizar o sonho informado.");
     }
+
+    public DreamNotFoundException(String message) {
+        super(message);
+    }
 }
