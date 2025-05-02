@@ -137,4 +137,26 @@ public class DreamsServiceFailureTest {
         verify(repository, times(1)).findById(any(UUID.class));
     }
 
+    @Test
+    public void notDeletedDreamBecauseDreamNotFoundException() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+
+        // Then (Então)
+        Exception exception = assertThrows(DreamNotFoundException.class, () -> {
+            service.deleteDream(UUID.randomUUID(), dream.getIdUser());
+        });
+
+        verify(repository, times(1)).findById(any(UUID.class));
+    }
 }
