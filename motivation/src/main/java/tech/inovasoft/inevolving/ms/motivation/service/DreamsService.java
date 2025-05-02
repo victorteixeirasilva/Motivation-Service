@@ -3,10 +3,8 @@ package tech.inovasoft.inevolving.ms.motivation.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.DreamNotFoundException;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.MaximumNumberOfRegisteredDreamsException;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.NotSavedDTOInDbException;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.UserWithoutAuthorizationAboutThisDreamException;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseDeleteDream;
+import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
 
@@ -55,5 +53,24 @@ public class DreamsService {
         }
     }
 
+    public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser){
+        Optional<Dreams> dreamOpt = repository.findById(idDream);
+        if (dreamOpt.isEmpty()){
+            //TODO erro caso não encontre o sonho cujo id foi informado.
+            return null;
+        }
 
+        UUID dreamUserId = dreamOpt.get().getIdUser();
+        if (dreamUserId != idUser){
+            //TODO erro caso o usuário titular do sonho for diferente do usuário da requisição.
+            return null;
+        }
+
+        try {
+            repository.delete(dreamOpt.get());
+            return new ResponseDeleteDream("Sonho deletado!");
+        } catch (Exception e) {
+            throw new DataBaseException("Problema na hora de deletar Sonhos.");
+        }
+    }
 }

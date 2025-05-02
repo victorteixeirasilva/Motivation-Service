@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseDeleteDream;
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.DreamNotFoundException;
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.MaximumNumberOfRegisteredDreamsException;
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.UserWithoutAuthorizationAboutThisDreamException;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-public class DreamsServiceTest {
+public class DreamsServiceSuccessTest {
 
     @Mock
     private DreamsRepository repository;
@@ -75,45 +76,6 @@ public class DreamsServiceTest {
     }
 
     @Test
-    public void notAddDreamBecauseMax() {
-        // Given (Dado)
-        DreamRequestDTO dto = new DreamRequestDTO(
-                "Dinheiro",
-                "Ganhar muito dinheiro",
-                "Urldaimagem.com",
-                UUID.randomUUID() // Correção: gera um UUID válido
-        );
-
-
-
-        List<Dreams> dreams = new ArrayList<>();
-        for (int i = 1; i <= 200; i++){
-            dreams.add(new Dreams(
-                UUID.randomUUID(),
-                dto.name(),
-                dto.description(),
-                dto.urlImage(),
-                dto.idUser()
-            ));
-        }
-
-
-        // When (Quando)
-        when(repository.findAllByUserId(dto.idUser())).thenReturn(dreams);
-        // When & Then (Verificação da exceção)
-        Exception exception = assertThrows(MaximumNumberOfRegisteredDreamsException.class, () -> {
-            service.addDream(dto);
-        });
-
-
-        // Then (Então)
-        // Verifica se a mensagem de erro está correta
-        assertEquals("Não foi possível cadastrar o sonho pois o mesmo já tem 200 sonhos cadastrados.", exception.getMessage());
-
-        verify(repository, times(1)).findAllByUserId(dto.idUser()); // Garante que o repositório foi chamado corretamente
-    }
-
-    @Test
     public void updateDreamOk() throws UserWithoutAuthorizationAboutThisDreamException {
         // Given (Dado)
         Dreams dream = new Dreams(
@@ -159,74 +121,6 @@ public class DreamsServiceTest {
     }
 
     @Test
-    public void notUpdateDreamBecauseUserWithoutAuthorizationAboutThisDream() {
-        // Given (Dado)
-        Dreams dream = new Dreams(
-                UUID.randomUUID(),
-                "Dinheiro",
-                "Ganhar muito dinheiro",
-                "Urldaimagem.com",
-                UUID.randomUUID()
-        );
-
-        DreamRequestDTO dto = new DreamRequestDTO(
-                "Dinheiro2",
-                "Ganhar muito dinheiro2",
-                "Urldaimagem.com2",
-                UUID.randomUUID()
-        );
-
-        Dreams newDream = new Dreams(
-                dream.getId(),
-                dto.name(),
-                dto.description(),
-                dto.urlImage(),
-                dream.getIdUser()
-        );
-
-        // When (Quando)
-        // Mockando a resposta do repository
-        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
-
-        // Then (Então)
-        Exception exception = assertThrows(UserWithoutAuthorizationAboutThisDreamException.class, () -> {
-            service.updateDream(dream.getId(), dto);
-        });
-
-        verify(repository, times(1)).findById(any(UUID.class));
-    }
-
-    @Test
-    public void notUpdateDreamBecauseDreamNotFoundException() {
-        // Given (Dado)
-        Dreams dream = new Dreams(
-                UUID.randomUUID(),
-                "Dinheiro",
-                "Ganhar muito dinheiro",
-                "Urldaimagem.com",
-                UUID.randomUUID()
-        );
-
-        DreamRequestDTO dto = new DreamRequestDTO(
-                "Dinheiro2",
-                "Ganhar muito dinheiro2",
-                "Urldaimagem.com2",
-                UUID.randomUUID()
-        );
-
-        // When (Quando)
-        // Mockando a resposta do repository
-        when(repository.findById(dream.getId())).thenReturn(Optional.empty());
-
-        // Then (Então)
-        Exception exception = assertThrows(DreamNotFoundException.class, () -> {
-            service.updateDream(dream.getId(), dto);
-        });
-
-        verify(repository, times(1)).findById(any(UUID.class));
-    }
-
-    @Test
     public void deleteDreamOk() {
         // Given (Dado)
         Dreams dream = new Dreams(
@@ -241,8 +135,10 @@ public class DreamsServiceTest {
         // Mockando a resposta do repository
         when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
         doNothing().when(repository).delete(dream);
+        ResponseDeleteDream responseDeleteDream = service.deleteDream(dream.getId(), dream.getIdUser());
 
         // Then (Então)
+        assertEquals("Sonho deletado!", responseDeleteDream.message());
         verify(repository, times(1)).findById(any(UUID.class));
         verify(repository, times(1)).delete(dream);
     }
