@@ -11,9 +11,8 @@ import static org.mockito.Mockito.*;
 
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseDeleteDream;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.DreamNotFoundException;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.MaximumNumberOfRegisteredDreamsException;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.UserWithoutAuthorizationAboutThisDreamException;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisionBord;
+import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
 import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
@@ -33,7 +32,7 @@ public class DreamsServiceSuccessTest {
     private DreamsService service;
 
     @Test
-    public void addDreamOk() {
+    public void addDreamOk() throws MaximumNumberOfRegisteredDreamsException, NotSavedDTOInDbException {
         // Given (Dado)
         DreamRequestDTO dto = new DreamRequestDTO(
                 "Dinheiro",
@@ -76,7 +75,7 @@ public class DreamsServiceSuccessTest {
     }
 
     @Test
-    public void updateDreamOk() {
+    public void updateDreamOk() throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException {
         // Given (Dado)
         Dreams dream = new Dreams(
                 UUID.randomUUID(),
@@ -121,7 +120,7 @@ public class DreamsServiceSuccessTest {
     }
 
     @Test
-    public void deleteDreamOk() {
+    public void deleteDreamOk() throws UserWithoutAuthorizationAboutThisDreamException, DataBaseException, DreamNotFoundException {
         // Given (Dado)
         Dreams dream = new Dreams(
                 UUID.randomUUID(),
@@ -144,7 +143,7 @@ public class DreamsServiceSuccessTest {
     }
 
     @Test
-    public void getDreamByIdOk() {
+    public void getDreamByIdOk() throws UserWithoutAuthorizationAboutThisDreamException, DataBaseException, DreamNotFoundException {
         // Given (Dado)
         Dreams dream = new Dreams(
                 UUID.randomUUID(),
@@ -169,7 +168,7 @@ public class DreamsServiceSuccessTest {
     }
 
     @Test
-    public void getDreamsByUserIdOk(){
+    public void getDreamsByUserIdOk() throws DataBaseException, DreamNotFoundException {
         // Given (Dado)
         Dreams dreamMock = new Dreams(
                 UUID.randomUUID(),
@@ -195,6 +194,35 @@ public class DreamsServiceSuccessTest {
         verify(repository, times(1)).findAllByUserId(dreamMock.getIdUser());
     }
 
+    @Test
+    public void generateVisionBordByUserId() throws DataBaseException, DreamNotFoundException {
+        // Given (Dado)
+        Dreams dreamMock = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        List<Dreams> dreamsMock = new ArrayList<>();
+        for (int i = 1; i <= 200; i++){
+            dreamsMock.add(dreamMock);
+        }
+
+        ResponseVisionBord expectedVisionBord = new ResponseVisionBord("urlvisionbord");
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(service.getDreamsByUserId(dreamMock.getIdUser())).thenReturn(dreamsMock);
+        ResponseVisionBord visionBordResult = service.generateVisionBordByUserId(dreamMock.getIdUser());
+
+        // Then (Então)
+        //TODO Fazer primeiro o teste de selectedDreams
+//        assertEquals(200, dreamsBd.size());
+//        assertEquals(dreamMock.getIdUser(), dreamsBd.get(120).getIdUser());
+        verify(service, times(1)).getDreamsByUserId(dreamMock.getIdUser());
+    }
 
 
 }

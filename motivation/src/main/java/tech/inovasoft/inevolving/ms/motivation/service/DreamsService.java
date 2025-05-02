@@ -21,7 +21,7 @@ public class DreamsService {
 
     private static final int MAX_DREAMS = 200;
 
-    public Dreams addDream(DreamRequestDTO dto) {
+    public Dreams addDream(DreamRequestDTO dto) throws MaximumNumberOfRegisteredDreamsException, NotSavedDTOInDbException {
         List<Dreams> dreams = repository.findAllByUserId(dto.idUser());
         if (dreams.size() >= MAX_DREAMS) {
             throw new MaximumNumberOfRegisteredDreamsException();
@@ -33,7 +33,7 @@ public class DreamsService {
         }
     }
 
-    public Dreams updateDream(UUID id, DreamRequestDTO dto) {
+    public Dreams updateDream(UUID id, DreamRequestDTO dto) throws DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
         Optional<Dreams> dreamOpt = repository.findById(id);
         if (dreamOpt.isEmpty()){
             throw new DreamNotFoundException();
@@ -54,7 +54,7 @@ public class DreamsService {
         }
     }
 
-    public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser) {
+    public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser) throws DataBaseException, DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
         Optional<Dreams> dreamOpt;
         try {
             dreamOpt = repository.findById(idDream);
@@ -80,7 +80,7 @@ public class DreamsService {
         }
     }
 
-    public Dreams getDreamByID(UUID idDream, UUID idUser) {
+    public Dreams getDreamByID(UUID idDream, UUID idUser) throws DataBaseException, DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
         Optional<Dreams> dreamOpt;
         try {
             dreamOpt = repository.findById(idDream);
@@ -100,7 +100,7 @@ public class DreamsService {
         return dreamOpt.get();
     }
 
-    public List<Dreams> getDreamsByUserId(UUID idUser){
+    public List<Dreams> getDreamsByUserId(UUID idUser) throws DreamNotFoundException, DataBaseException {
         List<Dreams> dreams;
         try {
             dreams = repository.findAllByUserId(idUser);
@@ -115,7 +115,12 @@ public class DreamsService {
         return dreams;
     }
 
+    private List<Dreams> selectedDreams(List<Dreams> allDreams) {
+        return null;
+    }
+
     public ResponseVisionBord generateVisionBordByUserId(UUID idUser){
+        //TODO Fazer primeiro o selectedDreams
         return null;
     }
 }

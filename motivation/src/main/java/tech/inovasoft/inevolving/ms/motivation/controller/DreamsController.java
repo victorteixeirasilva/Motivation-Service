@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
+import tech.inovasoft.inevolving.ms.motivation.domain.exception.MaximumNumberOfRegisteredDreamsException;
+import tech.inovasoft.inevolving.ms.motivation.domain.exception.NotSavedDTOInDbException;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
 
@@ -26,7 +28,7 @@ public class DreamsController {
     @Operation(summary = "Adiciona um novo sonho.", description = "Retorna o sonho cadastrado")
     @Async("asyncExecutor")
     @PostMapping
-    public CompletableFuture<ResponseEntity> addDream (@RequestBody DreamRequestDTO dreamDTO) {
+    public CompletableFuture<ResponseEntity> addDream (@RequestBody DreamRequestDTO dreamDTO) throws MaximumNumberOfRegisteredDreamsException, NotSavedDTOInDbException {
         return CompletableFuture.completedFuture(ResponseEntity.ok(service.addDream(dreamDTO)));
     }
 }
