@@ -138,9 +138,36 @@ public class DreamsServiceSuccessTest {
         ResponseDeleteDream responseDeleteDream = service.deleteDream(dream.getId(), dream.getIdUser());
 
         // Then (Então)
-        assertEquals("Sonho deletado!", responseDeleteDream.message());
+        assertEquals("Dream deleted!", responseDeleteDream.message());
         verify(repository, times(1)).findById(any(UUID.class));
         verify(repository, times(1)).delete(dream);
     }
+
+    @Test
+    public void getDreamByIdOk() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+        Dreams dreamBd = service.getDreamByID(dream.getId(), dream.getIdUser());
+
+        // Then (Então)
+        assertEquals(dream.getId(), dreamBd.getId());
+        assertEquals(dream.getIdUser(), dreamBd.getIdUser());
+        assertEquals(dream.getName(), dreamBd.getName());
+        assertEquals(dream.getDescription(), dreamBd.getDescription());
+        assertEquals(dream.getUrlImage(), dreamBd.getUrlImage());
+        verify(repository, times(1)).findById(dream.getId());
+    }
+
+
 
 }

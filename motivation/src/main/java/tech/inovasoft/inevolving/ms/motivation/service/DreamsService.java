@@ -32,7 +32,7 @@ public class DreamsService {
         }
     }
 
-    public Dreams updateDream(UUID id, DreamRequestDTO dto) throws UserWithoutAuthorizationAboutThisDreamException {
+    public Dreams updateDream(UUID id, DreamRequestDTO dto) {
         Optional<Dreams> dreamOpt = repository.findById(id);
         if (dreamOpt.isEmpty()){
             throw new DreamNotFoundException();
@@ -53,7 +53,7 @@ public class DreamsService {
         }
     }
 
-    public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser){
+    public ResponseDeleteDream deleteDream(UUID idDream, UUID idUser) {
         Optional<Dreams> dreamOpt = repository.findById(idDream);
         if (dreamOpt.isEmpty()){
             throw new DreamNotFoundException();
@@ -61,16 +61,19 @@ public class DreamsService {
 
         UUID dreamUserId = dreamOpt.get().getIdUser();
         if (dreamUserId != idUser){
-            //TODO erro caso o usuário titular do sonho for diferente do usuário da requisição.
-            return null;
+            throw new UserWithoutAuthorizationAboutThisDreamException();
         }
 
         Dreams dream = dreamOpt.get();
         try {
             repository.delete(dream);
-            return new ResponseDeleteDream("Dream deleted! ("+dream+")");
+            return new ResponseDeleteDream("Dream deleted!");
         } catch (Exception e) {
             throw new DataBaseException("Error when deleting Dreams.");
         }
+    }
+
+    public Dreams getDreamByID(UUID id, UUID idUser) {
+        return null;
     }
 }
