@@ -6,9 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.UpdateDreamRequestDTO;
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.MaximumNumberOfRegisteredDreamsException;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
@@ -16,6 +18,7 @@ import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,7 +74,7 @@ public class DreamsServiceTest {
     }
 
     @Test
-    public void addDreamMax200() {
+    public void notAddDreamBecauseMax() {
         // Given (Dado)
         DreamRequestDTO dto = new DreamRequestDTO(
                 "Dinheiro",
@@ -108,4 +111,50 @@ public class DreamsServiceTest {
 
         verify(repository, times(1)).findAllByUserId(dto.idUser()); // Garante que o repositório foi chamado corretamente
     }
+
+    @Test
+    public void updateDreamOk() {
+        // Given (Dado)
+        UpdateDreamRequestDTO dto = new UpdateDreamRequestDTO(
+                "Dinheiro2",
+                "Ganhar muito dinheiro2",
+                "Urldaimagem.com2"
+        );
+
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        Dreams newDream = new Dreams(
+                dream.getId(),
+                dto.name(),
+                dto.description(),
+                dto.urlImage(),
+                dream.getIdUser()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+        when(repository.save(newDream)).thenReturn(newDream);
+        Dreams updatedDream = service.updateDream(dream.getId(), dto);
+
+
+        // Then (Então)
+        assertEquals(dream.getId(), updatedDream.getId());
+        assertEquals(dream.getIdUser(), updatedDream.getIdUser());
+        assertNotEquals(dream.getName(), updatedDream.getName());
+        assertNotEquals(dream.getDescription(), updatedDream.getDescription());
+        assertNotEquals(dream.getUrlImage(), updatedDream.getUrlImage());
+
+        verify(repository, times(1)).findById(any(UUID.class));
+        verify(repository, times(1)).save(any(Dreams.class)); // Garante que o repositório foi chamado corretamente
+
+    }
+
+
 }
