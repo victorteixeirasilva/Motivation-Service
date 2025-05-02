@@ -1,4 +1,4 @@
-package tech.inovasoft.inevolving.ms.motivation;
+package tech.inovasoft.inevolving.ms.motivation.unitary;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -196,7 +196,6 @@ public class DreamsServiceTest {
         verify(repository, times(1)).findById(any(UUID.class));
     }
 
-
     @Test
     public void notUpdateDreamBecauseDreamNotFoundException() {
         // Given (Dado)
@@ -227,5 +226,25 @@ public class DreamsServiceTest {
         verify(repository, times(1)).findById(any(UUID.class));
     }
 
+    @Test
+    public void deleteDreamOk() {
+        // Given (Dado)
+        Dreams dream = new Dreams(
+                UUID.randomUUID(),
+                "Dinheiro",
+                "Ganhar muito dinheiro",
+                "Urldaimagem.com",
+                UUID.randomUUID()
+        );
+
+        // When (Quando)
+        // Mockando a resposta do repository
+        when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
+        doNothing().when(repository).delete(dream);
+
+        // Then (Então)
+        verify(repository, times(1)).findById(any(UUID.class));
+        verify(repository, times(1)).delete(dream);
+    }
 
 }
