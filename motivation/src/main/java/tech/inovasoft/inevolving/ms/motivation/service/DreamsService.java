@@ -46,7 +46,7 @@ public class DreamsService {
             Dreams newDream = dream;
             UUID idUser = dreamOpt.get().getIdUser();
 
-            if (idUser == newDream.getIdUser()) {
+            if (idUser.equals(newDream.getIdUser())) {
                 UUID idDream = dreamOpt.get().getId();
                 newDream.setId(idDream);
 
@@ -71,7 +71,8 @@ public class DreamsService {
         }
 
         UUID dreamUserId = dreamOpt.get().getIdUser();
-        if (dreamUserId != idUser){
+
+        if (!dreamUserId.equals(idUser)){
             throw new UserWithoutAuthorizationAboutThisDreamException();
         }
 
