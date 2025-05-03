@@ -91,7 +91,8 @@ public class DreamsServiceSuccessTest {
                 UUID.randomUUID()
         );
 
-        DreamRequestDTO dto = new DreamRequestDTO(
+        Dreams dto = new Dreams(
+                dream.getId(),
                 "Dinheiro2",
                 "Ganhar muito dinheiro2",
                 "Urldaimagem.com2",
@@ -100,9 +101,9 @@ public class DreamsServiceSuccessTest {
 
         Dreams newDream = new Dreams(
                 dream.getId(),
-                dto.name(),
-                dto.description(),
-                dto.urlImage(),
+                dto.getName(),
+                dto.getDescription(),
+                dto.getUrlImage(),
                 dream.getIdUser()
         );
 
@@ -110,7 +111,7 @@ public class DreamsServiceSuccessTest {
         // Mockando a resposta do repository
         when(repository.findById(dream.getId())).thenReturn(Optional.of(dream));
         when(repository.save(any(Dreams.class))).thenReturn(newDream);
-        Dreams updatedDream = service.updateDream(dream.getId(), dto);
+        Dreams updatedDream = service.updateDream(dto);
 
 
         // Then (Então)

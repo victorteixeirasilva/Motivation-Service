@@ -74,25 +74,19 @@ public class DreamsServiceFailureTest {
         // Given (Dado)
         Dreams dream = new Dreams(
                 UUID.randomUUID(),
-                "Dinheiro",
-                "Ganhar muito dinheiro",
-                "Urldaimagem.com",
-                UUID.randomUUID()
-        );
-
-        DreamRequestDTO dto = new DreamRequestDTO(
                 "Dinheiro2",
                 "Ganhar muito dinheiro2",
                 "Urldaimagem.com2",
                 UUID.randomUUID()
         );
 
+
         Dreams newDream = new Dreams(
                 dream.getId(),
-                dto.name(),
-                dto.description(),
-                dto.urlImage(),
-                dream.getIdUser()
+                dream.getName(),
+                dream.getDescription(),
+                dream.getUrlImage(),
+                UUID.randomUUID()
         );
 
         // When (Quando)
@@ -101,7 +95,7 @@ public class DreamsServiceFailureTest {
 
         // Then (Então)
         Exception exception = assertThrows(UserWithoutAuthorizationAboutThisDreamException.class, () -> {
-            service.updateDream(dream.getId(), dto);
+            service.updateDream(newDream);
         });
 
         verify(repository, times(1)).findById(any(UUID.class));
@@ -131,7 +125,7 @@ public class DreamsServiceFailureTest {
 
         // Then (Então)
         Exception exception = assertThrows(DreamNotFoundException.class, () -> {
-            service.updateDream(dream.getId(), dto);
+            service.updateDream(dream);
         });
 
         verify(repository, times(1)).findById(any(UUID.class));

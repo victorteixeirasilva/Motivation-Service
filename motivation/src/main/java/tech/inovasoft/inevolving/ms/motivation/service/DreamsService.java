@@ -37,13 +37,13 @@ public class DreamsService {
         }
     }
 
-    public Dreams updateDream(UUID id, DreamRequestDTO dto) throws DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
-        Optional<Dreams> dreamOpt = repository.findById(id);
+    public Dreams updateDream(Dreams dream) throws DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
+        Optional<Dreams> dreamOpt = repository.findById(dream.getId());
         if (dreamOpt.isEmpty()){
             throw new DreamNotFoundException();
 
         } else {
-            Dreams newDream = new Dreams(dto);
+            Dreams newDream = dream;
             UUID idUser = dreamOpt.get().getIdUser();
 
             if (idUser == newDream.getIdUser()) {
@@ -96,8 +96,7 @@ public class DreamsService {
             throw new DreamNotFoundException();
         }
 
-        UUID dreamUserId = dreamOpt.get().getIdUser();
-        if (dreamUserId != idUser){
+        if (!idUser.equals(dreamOpt.get().getIdUser())){
             throw new UserWithoutAuthorizationAboutThisDreamException();
         }
 
