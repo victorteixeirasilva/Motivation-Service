@@ -127,7 +127,7 @@ public class DreamsService {
     public ResponseVisionBord generateVisionBordByUserId(UUID idUser) throws DataBaseException, DreamNotFoundException {
         List<Dreams> allDreams = getDreamsByUserId(idUser);
         if (allDreams.size() < 100) {
-            throw new DreamNotFoundException("O usuário possui menos de 100 sonhos, impossível gerar Vision Board.");
+            throw new DreamNotFoundException("User has less than 100 dreams, impossible to generate Vision Board.");
         }
 
         List<Dreams> selectedDreams = selectedDreams(allDreams);
