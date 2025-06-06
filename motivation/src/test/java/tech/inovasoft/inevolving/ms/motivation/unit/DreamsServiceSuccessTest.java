@@ -1,4 +1,4 @@
-package tech.inovasoft.inevolving.ms.motivation.unitary;
+package tech.inovasoft.inevolving.ms.motivation.unit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

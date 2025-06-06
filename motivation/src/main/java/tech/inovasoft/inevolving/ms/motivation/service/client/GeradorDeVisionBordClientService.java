@@ -17,6 +17,6 @@ public interface GeradorDeVisionBordClientService {
      * @return - Imagem do vision board
      */
     @PostMapping
-    public ImageUrl gerador(@RequestBody RequestGeradorDeVisionBordDTO dto);
+    ImageUrl gerador(@RequestBody RequestGeradorDeVisionBordDTO dto);
 
 }
