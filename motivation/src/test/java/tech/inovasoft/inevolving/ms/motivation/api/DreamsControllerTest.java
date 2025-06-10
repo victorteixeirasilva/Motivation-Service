@@ -174,7 +174,19 @@ public class DreamsControllerTest {
 
     @Test
     public void generateVisionBordByUserId_ok() {
-        //TODO: Desenvolver teste do End-Point
+        for (int i = 1; i <= 100; i++) {
+            addDream(idUser);
+        }
+
+        RequestSpecification requestSpecification = given()
+                .contentType(ContentType.JSON);
+
+        ValidatableResponse response = requestSpecification
+                .when()
+                .get("http://localhost:" + port + "/ms/motivation/dreams/visionbord/generate/" + idUser)
+                .then();
+
+        response.assertThat().statusCode(200);
     }
 
 }
