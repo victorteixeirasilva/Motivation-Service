@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.RequestDeleteDream;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 
 import java.util.UUID;
@@ -111,7 +112,23 @@ public class DreamsControllerTest {
 
     @Test
     public void deleteDream_ok() {
-        //TODO: Desenvolver teste do End-Point
+        UUID idDream = addDream();
+
+        var request = new RequestDeleteDream(
+                idDream,
+                idUser
+        );
+
+        RequestSpecification requestSpecification = given()
+                .contentType(ContentType.JSON);
+
+        ValidatableResponse response = requestSpecification
+                .body(request)
+                .when()
+                .delete("http://localhost:" + port + "/ms/motivation/dreams")
+                .then();
+
+        response.assertThat().statusCode(200);
     }
 
     @Test
