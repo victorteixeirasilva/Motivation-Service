@@ -3,6 +3,7 @@ package tech.inovasoft.inevolving.ms.motivation.api;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDT
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.RequestDeleteDream;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 
+import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -53,7 +55,7 @@ public class DreamsControllerTest {
                 .body("idUser", equalTo(idUser.toString()));
     }
 
-    private UUID addDream(){
+    private UUID addDream(UUID idUser){
         DreamRequestDTO request = new DreamRequestDTO(
                 "Nome do Sonho",
                 "Descrição do Sonho",
@@ -83,7 +85,7 @@ public class DreamsControllerTest {
     @Test
     public void updateDream_ok() {
 
-        UUID idDream = addDream();
+        UUID idDream = addDream(idUser);
 
         var request = new Dreams(
                 idDream,
@@ -112,7 +114,7 @@ public class DreamsControllerTest {
 
     @Test
     public void deleteDream_ok() {
-        UUID idDream = addDream();
+        UUID idDream = addDream(idUser);
 
         var request = new RequestDeleteDream(
                 idDream,
@@ -133,7 +135,24 @@ public class DreamsControllerTest {
 
     @Test
     public void getDreamsByUserId_ok() {
-        //TODO: Desenvolver teste do End-Point
+        UUID idUser = UUID.randomUUID();
+        for (int i = 1; i <= 5 ; i++) {
+            addDream(idUser);
+        }
+
+        RequestSpecification requestSpecification = given()
+                .contentType(ContentType.JSON);
+
+        ValidatableResponse response = requestSpecification
+                .when()
+                .get("http://localhost:" + port + "/ms/motivation/dreams/user/" + idUser)
+                .then();
+
+        response.assertThat().statusCode(200);
+
+        List<Dreams> dreamsList = response.extract().body().jsonPath().get();
+
+        Assertions.assertEquals(5, dreamsList.size());
     }
 
     @Test
