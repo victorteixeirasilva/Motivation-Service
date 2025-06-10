@@ -38,7 +38,7 @@ public class GeradorDeVisionBordClientServiceTest {
         ValidatableResponse response = requestSpecification
                 .body(request)
                 .when()
-                .post("http://0.0.0.0:5000/generate-vision-board")//TODO: Mudar para o endereço do container e esconder ele em variaveis de ambiente
+                .post("http://0.0.0.0:5000/generate-vision-board")
                 .then();
 
         response.assertThat().statusCode(200);

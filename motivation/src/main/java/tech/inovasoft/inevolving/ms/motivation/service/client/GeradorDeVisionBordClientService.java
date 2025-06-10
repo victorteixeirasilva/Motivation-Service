@@ -8,7 +8,7 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.dto.RequestGerador
 
 import java.util.List;
 
-@FeignClient(name = "GeradorDeVisionBord", url = "http://0.0.0.0:5000/generate-vision-board") //TODO: Mudar para o endereço do container e esconder ele em variaveis de ambiente
+@FeignClient(name = "GeradorDeVisionBord", url = "http://0.0.0.0:5000/generate-vision-board")
 public interface GeradorDeVisionBordClientService {
 
     /**
