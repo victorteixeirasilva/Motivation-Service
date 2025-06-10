@@ -49,7 +49,6 @@ public class DreamsControllerTest {
                 .body("description", equalTo(request.description())).and()
                 .body("urlImage", equalTo(request.urlImage())).and()
                 .body("idUser", equalTo(idUser.toString()));
-        //TODO: Desenvolver teste do End-Point
     }
 
     @Test
