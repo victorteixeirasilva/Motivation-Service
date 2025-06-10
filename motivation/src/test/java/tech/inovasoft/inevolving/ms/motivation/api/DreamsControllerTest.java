@@ -157,7 +157,19 @@ public class DreamsControllerTest {
 
     @Test
     public void getDreamByID_ok() {
-        //TODO: Desenvolver teste do End-Point
+        UUID idDream = addDream(idUser);
+
+        RequestSpecification requestSpecification = given()
+                .contentType(ContentType.JSON);
+
+        ValidatableResponse response = requestSpecification
+                .when()
+                .get("http://localhost:" + port + "/ms/motivation/dreams/"+ idDream + "/" + idUser)
+                .then();
+
+        response.assertThat().statusCode(200).and()
+                .body("id", equalTo(idDream.toString()));
+
     }
 
     @Test
