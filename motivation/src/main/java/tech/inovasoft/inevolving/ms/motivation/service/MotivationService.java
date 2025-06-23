@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.MessageResponseDTO;
+import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.service.client.api.ApiClientService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.api.dto.UserEmailDTO;
 import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.EmailClientService;
@@ -12,6 +13,7 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.Task
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.Task;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class MotivationService {
@@ -22,6 +24,8 @@ public class MotivationService {
     private TasksClientService tasksClientService;
     @Autowired
     private EmailClientService emailClientService;
+    @Autowired
+    private DreamsService dreamsService;
 
     public MessageResponseDTO sendEmailForUsersWithLateTasks() {
         ResponseEntity<List<UserEmailDTO>> responseUsers;
@@ -64,4 +68,44 @@ public class MotivationService {
         }
     }
 
+    public MessageResponseDTO sendEmailForUsersDisconnected() {
+        ResponseEntity<List<UserEmailDTO>> responseUsers;
+
+        try {
+            responseUsers = apiClientService.getUsersDisconnectedAndActive();
+        } catch (Exception e) {
+            return new MessageResponseDTO("Erro em getUsersIsVerifiedAndActive");
+        }
+
+        if (responseUsers.getStatusCode().is2xxSuccessful() && responseUsers.getBody() != null) {
+            for (UserEmailDTO user : responseUsers.getBody()) {
+                List<Dreams> dreams;
+
+                try {
+                    dreams = dreamsService.getDreamsByUserId(user.id());
+                } catch (Exception e) {
+                    continue;
+                }
+
+                String body = "";
+
+                if (!dreams.isEmpty()) {
+                    body = "\nOlá, notamos sua ausência, vamos te ajudar a se reencontrar: \n";
+
+                    Random random = new Random();
+                    int idexRandom = random.nextInt(dreams.size());
+                    Dreams dream = dreams.get(idexRandom);
+                    body += "\nSonho: " + dream.getName() + " - " + dream.getDescription() + "\n";
+
+                    emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body));
+                } else {
+                    body = "Você não tem sonhos cadastrados, cadastre-os para que possamos te ajudar a sempre manter a diciplina!";
+                    emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body));
+                }
+            }
+            return new MessageResponseDTO("Emails enviado com sucesso");
+        } else {
+            return new MessageResponseDTO("Erro ao enviar emails");
+        }
+    }
 }

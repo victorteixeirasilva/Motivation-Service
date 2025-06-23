@@ -38,5 +38,15 @@ public class MotivationController {
         ));
     }
 
+    @Operation(description = "Envia email motivacional para todos os usuários que estão offline a um dia.")
+    @Async("asyncExecutor")
+    @GetMapping("/disconnected")
+    public CompletableFuture<ResponseEntity<MessageResponseDTO>> sendEmailForUsersDisconnected(
+    ) {
+        return CompletableFuture.completedFuture(ResponseEntity.ok(
+                service.sendEmailForUsersDisconnected()
+        ));
+    }
+
 
 }

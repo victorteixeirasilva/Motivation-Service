@@ -11,10 +11,13 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_
 
 import java.util.List;
 
-@FeignClient(name = "api-service", url = "http://localhost:8090/api/user/verified/active")
+@FeignClient(name = "api-service", url = "http://localhost:8090/api/user")
 public interface ApiClientService {
 
-    @GetMapping
+    @GetMapping("/verified/active")
     ResponseEntity<List<UserEmailDTO>> getUsersIsVerifiedAndActive();
+
+    @GetMapping("/disconnected")
+    ResponseEntity<List<UserEmailDTO>> getUsersDisconnectedAndActive();
 
 }

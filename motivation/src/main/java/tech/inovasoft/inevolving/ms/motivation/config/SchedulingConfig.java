@@ -13,10 +13,16 @@ public class SchedulingConfig {
     @Autowired
     private MotivationService motivationService;
 
-    @Scheduled(cron = "0 0 6 1 * *", zone = "America/Sao_Paulo")
+    @Scheduled(cron = "0 0 8 1 * *", zone = "America/Sao_Paulo")
     public void sendEmailForUsersWithLateTasks() {
         // lógica que será executada
         motivationService.sendEmailForUsersWithLateTasks();
+    }
+
+    @Scheduled(cron = "0 0 6 * * *", zone = "America/Sao_Paulo")
+    public void sendEmailForUsersDisconnected() {
+        // lógica que será executada
+        motivationService.sendEmailForUsersDisconnected();
     }
 
 }
