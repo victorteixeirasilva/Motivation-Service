@@ -28,7 +28,6 @@ public class MotivationController {
     @Autowired
     private MotivationService service;
 
-    //TODO: Adicionar essa rota ao api
     @Operation(description = "Envia email motivacional para todos os usuários, com suas tarefas atrasadas")
     @Async("asyncExecutor")
     @GetMapping("/tasks/late")

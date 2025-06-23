@@ -39,7 +39,7 @@ public class DreamsController {
 
     @Operation(summary = "Editar um sonho. | Edit a dream.", description = "Retorna o sonho editado. | Returns the edited dream.")
     @Async("asyncExecutor")
-    @PatchMapping
+    @PutMapping
     public CompletableFuture<ResponseEntity<Dreams>> updateDream (
             @RequestBody Dreams dreamDTO
     ) throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException {
