@@ -1,12 +1,10 @@
-package tech.inovasoft.inevolving.ms.motivation.service.client;
+package tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import tech.inovasoft.inevolving.ms.motivation.service.client.dto.ImageUrl;
-import tech.inovasoft.inevolving.ms.motivation.service.client.dto.RequestGeradorDeVisionBordDTO;
-
-import java.util.List;
+import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.ImageUrl;
+import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.RequestGeradorDeVisionBordDTO;
 
 @FeignClient(name = "GeradorDeVisionBord", url = "http://0.0.0.0:5000/generate-vision-board")
 public interface GeradorDeVisionBordClientService {

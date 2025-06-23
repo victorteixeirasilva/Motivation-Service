@@ -8,9 +8,9 @@ import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisio
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.repository.DreamsRepository;
-import tech.inovasoft.inevolving.ms.motivation.service.client.GeradorDeVisionBordClientService;
-import tech.inovasoft.inevolving.ms.motivation.service.client.dto.ImageUrl;
-import tech.inovasoft.inevolving.ms.motivation.service.client.dto.RequestGeradorDeVisionBordDTO;
+import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.GeradorDeVisionBordClientService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.ImageUrl;
+import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.RequestGeradorDeVisionBordDTO;
 
 import java.util.*;
 
