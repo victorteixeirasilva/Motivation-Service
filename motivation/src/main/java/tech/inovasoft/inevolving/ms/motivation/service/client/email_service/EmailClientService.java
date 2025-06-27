@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@FeignClient(name = "email-service", url = "http://localhost:8092/ms/email")
+@FeignClient(name = "email-service", url = "${inevolving.uri.ms.email}")
 public interface EmailClientService {
 
     @PostMapping

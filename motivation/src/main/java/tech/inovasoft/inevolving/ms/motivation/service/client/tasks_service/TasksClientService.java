@@ -9,7 +9,7 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "tasks-service", url = "http://localhost:8085/ms/tasks/late")
+@FeignClient(name = "tasks-service", url = "${inevolving.uri.ms.task}")
 public interface TasksClientService {
 
     @GetMapping("/{idUser}")

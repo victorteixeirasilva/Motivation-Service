@@ -11,7 +11,7 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_
 
 import java.util.List;
 
-@FeignClient(name = "api-service", url = "http://localhost:8090/api/user")
+@FeignClient(name = "api-service", url = "${inevolving.uri.ms.api}")
 public interface ApiClientService {
 
     @GetMapping("/verified/active")

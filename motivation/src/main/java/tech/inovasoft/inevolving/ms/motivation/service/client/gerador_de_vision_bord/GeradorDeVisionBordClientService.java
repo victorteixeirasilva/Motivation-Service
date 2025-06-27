@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.ImageUrl;
 import tech.inovasoft.inevolving.ms.motivation.service.client.gerador_de_vision_bord.dto.RequestGeradorDeVisionBordDTO;
 
-@FeignClient(name = "GeradorDeVisionBord", url = "http://0.0.0.0:5000/generate-vision-board")
+@FeignClient(name = "GeradorDeVisionBord", url = "${inevolving.uri.ms.GeradorDeVisionBord}")
 public interface GeradorDeVisionBordClientService {
 
     /**
