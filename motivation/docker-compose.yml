@@ -1,0 +1,13 @@
+services:
+  motivation-service:
+    build:
+      context: .
+    container_name: motivation-service
+#    ports:
+#      - "8080:8080"
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
