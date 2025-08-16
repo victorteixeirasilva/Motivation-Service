@@ -43,12 +43,13 @@ public class MotivationService {
                 try {
                     responseTasks = tasksClientService.getTasksLate(user.id());
                 } catch (Exception e) {
+                    responseTasks = null;
                     continue;
                 }
 
                 String body = "";
 
-                if (responseTasks.getStatusCode().is2xxSuccessful() && responseTasks.getBody() != null) {
+                if (responseTasks != null) {
 
                     body = "Olá você tem, " + responseTasks.getBody().size() + " tarefa(s) atrasada(s): \n";
 
@@ -56,10 +57,20 @@ public class MotivationService {
                         body = body + "Tarefa: " + task.nameTask() + " - " + task.descriptionTask() + "\n";
                     }
 
-                    emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                    try {
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                    } catch (Exception e) {
+                        System.out.println("ERROR: " + e.getMessage());
+                        throw new RuntimeException("ERROR: " + e.getMessage());
+                    }
                 } else {
                     body = "Olá você tem, 0 tarefa(s) atrasada(s), meus parabens!";
-                    emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                    try {
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                    } catch (Exception e) {
+                        System.out.println("ERROR: " + e.getMessage());
+                        throw new RuntimeException("ERROR: " + e.getMessage());
+                    }
                 }
             }
             return new MessageResponseDTO("Emails enviado com sucesso");

@@ -12,7 +12,7 @@ import java.util.UUID;
 @FeignClient(name = "tasks-service", url = "${inevolving.uri.ms.task}")
 public interface TasksClientService {
 
-    @GetMapping("/{idUser}")
+    @GetMapping("/late/{idUser}")
     ResponseEntity<List<Task>> getTasksLate(
             @PathVariable UUID idUser
     );
