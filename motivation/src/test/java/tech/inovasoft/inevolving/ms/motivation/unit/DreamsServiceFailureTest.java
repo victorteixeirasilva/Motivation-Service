@@ -64,7 +64,7 @@ public class DreamsServiceFailureTest {
 
         // Then (Então)
         // Verifica se a mensagem de erro está correta
-        assertEquals("Não foi possível cadastrar o sonho pois o mesmo já tem 200 sonhos cadastrados.", exception.getMessage());
+        assertEquals("It was not possible to register the dream because it already has 200 registered dreams.", exception.getMessage());
 
         verify(repository, times(1)).findAllByUserId(dto.idUser()); // Garante que o repositório foi chamado corretamente
     }

@@ -30,8 +30,9 @@ public class MotivationController {
 
     @Operation(description = "Envia email motivacional para todos os usuários, com suas tarefas atrasadas")
     @Async("asyncExecutor")
-    @GetMapping("/tasks/late")
+    @GetMapping("/tasks/late/{token}")
     public CompletableFuture<ResponseEntity<MessageResponseDTO>> sendEmailForUsersWithLateTasks(
+        @PathVariable String token
     ) {
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.sendEmailForUsersWithLateTasks()
@@ -40,8 +41,9 @@ public class MotivationController {
 
     @Operation(description = "Envia email motivacional para todos os usuários que estão offline a um dia.")
     @Async("asyncExecutor")
-    @GetMapping("/disconnected")
+    @GetMapping("/disconnected/{token}")
     public CompletableFuture<ResponseEntity<MessageResponseDTO>> sendEmailForUsersDisconnected(
+        @PathVariable String token
     ) {
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.sendEmailForUsersDisconnected()

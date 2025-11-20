@@ -1,10 +1,13 @@
 package tech.inovasoft.inevolving.ms.motivation.service;
 
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.MessageResponseDTO;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.MicroServices;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.TokenCache;
 import tech.inovasoft.inevolving.ms.motivation.service.client.api.ApiClientService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.api.dto.UserEmailDTO;
 import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.EmailClientService;
@@ -14,6 +17,8 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.
 
 import java.util.List;
 import java.util.Random;
+
+import static tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.MicroServices.*;
 
 @Service
 public class MotivationService {
@@ -27,11 +32,42 @@ public class MotivationService {
     @Autowired
     private DreamsService dreamsService;
 
+    @Autowired
+    private TokenCache tokenCache;
+
+    private String cachedTokenGateway;
+    private String cachedTokenTasks;
+    private String cachedTokenEmail;
+
+    private String getValidTokenGateway() {
+        if (cachedTokenGateway == null) {
+            cachedTokenGateway = tokenCache.getToken(GATEWAY_SERVICE);
+        }
+        return cachedTokenGateway;
+    }
+
+    private String getValidTokenTasks() {
+        if (cachedTokenTasks == null) {
+            cachedTokenTasks = tokenCache.getToken(TASKS_SERVICE);
+        }
+        return cachedTokenTasks;
+    }
+
+    private String getValidTokenEmail() {
+        if (cachedTokenEmail == null) {
+            cachedTokenEmail = tokenCache.getToken(EMAIL_SERVICE);
+        }
+        return cachedTokenEmail;
+    }
+
     public MessageResponseDTO sendEmailForUsersWithLateTasks() {
         ResponseEntity<List<UserEmailDTO>> responseUsers;
 
         try {
-            responseUsers = apiClientService.getUsersIsVerifiedAndActive();
+            responseUsers = apiClientService.getUsersIsVerifiedAndActive(getValidTokenGateway());
+        } catch (FeignException.Unauthorized unauthorized) {
+            cachedTokenGateway = null;
+            return sendEmailForUsersWithLateTasks();
         } catch (Exception e) {
             return new MessageResponseDTO("Erro em getUsersIsVerifiedAndActive");
         }
@@ -41,10 +77,12 @@ public class MotivationService {
                 ResponseEntity<List<Task>> responseTasks;
 
                 try {
-                    responseTasks = tasksClientService.getTasksLate(user.id());
+                    responseTasks = tasksClientService.getTasksLate(user.id(), getValidTokenTasks());
+                } catch (FeignException.Unauthorized unauthorized) {
+                    cachedTokenTasks = null;
+                    return sendEmailForUsersWithLateTasks();
                 } catch (Exception e) {
                     responseTasks = null;
-//                    continue;
                 }
 
                 String body = "";
@@ -82,7 +120,10 @@ public class MotivationService {
                             "</html>";
 
                     try {
-                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body), getValidTokenEmail());
+                    } catch (FeignException.Unauthorized unauthorized) {
+                        cachedTokenEmail = null;
+                        return sendEmailForUsersWithLateTasks();
                     } catch (Exception e) {
                         System.out.println("ERROR: " + e.getMessage());
                         throw new RuntimeException("ERROR: " + e.getMessage());
@@ -107,7 +148,10 @@ public class MotivationService {
                             "  </body>\n" +
                             "</html>";
                     try {
-                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body), getValidTokenEmail());
+                    } catch (FeignException.Unauthorized unauthorized) {
+                        cachedTokenEmail = null;
+                        return sendEmailForUsersWithLateTasks();
                     } catch (Exception e) {
                         System.out.println("ERROR: " + e.getMessage());
                         throw new RuntimeException("ERROR: " + e.getMessage());
@@ -124,7 +168,10 @@ public class MotivationService {
         ResponseEntity<List<UserEmailDTO>> responseUsers;
 
         try {
-            responseUsers = apiClientService.getUsersDisconnectedAndActive();
+            responseUsers = apiClientService.getUsersDisconnectedAndActive(getValidTokenGateway());
+        } catch (FeignException.Unauthorized unauthorized) {
+            cachedTokenGateway = null;
+            return sendEmailForUsersDisconnected();
         } catch (Exception e) {
             return new MessageResponseDTO("Erro em getUsersIsVerifiedAndActive");
         }
@@ -149,10 +196,21 @@ public class MotivationService {
                     Dreams dream = dreams.get(idexRandom);
                     body += "\nSonho: " + dream.getName() + " - " + dream.getDescription() + "\n";
 
-                    emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body));
+                    try {
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body), getValidTokenEmail());
+                    } catch (FeignException.Unauthorized unauthorized) {
+                        cachedTokenEmail = null;
+                        return sendEmailForUsersDisconnected();
+                    }
                 } else {
+                    //TODO: Desenvolver o token cache, para fazer a requisição no email.
                     body = "Você não tem sonhos cadastrados, cadastre-os para que possamos te ajudar a sempre manter a diciplina!";
-                    emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body));
+                    try {
+                        emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body), getValidTokenEmail());
+                    } catch (FeignException.Unauthorized unauthorized) {
+                        cachedTokenEmail = null;
+                        return sendEmailForUsersDisconnected();
+                    }
                 }
             }
             return new MessageResponseDTO("Emails enviado com sucesso");

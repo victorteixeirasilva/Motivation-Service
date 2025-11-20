@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 @FeignClient(name = "email-service", url = "${inevolving.uri.ms.email}")
 public interface EmailClientService {
 
-    @PostMapping
-    ResponseEntity<String> sendEmail(@RequestBody EmailRequest request);
+    @PostMapping("/{token}")
+    ResponseEntity<String> sendEmail(@RequestBody EmailRequest request, @PathVariable String token);
 
 }
