@@ -44,18 +44,42 @@ public class MotivationService {
                     responseTasks = tasksClientService.getTasksLate(user.id());
                 } catch (Exception e) {
                     responseTasks = null;
-                    continue;
+//                    continue;
                 }
 
                 String body = "";
 
                 if (responseTasks != null) {
 
-                    body = "Olá você tem, " + responseTasks.getBody().size() + " tarefa(s) atrasada(s): \n";
+                    body = "<!DOCTYPE html>\n" +
+                            "<html lang=\"pt-BR\">\n" +
+                            "  <head>\n" +
+                            "    <meta charset=\"UTF-8\" />\n" +
+                            "    <title>Tarefas Atrasadas</title>\n" +
+                            "  </head>\n" +
+                            "  <body style=\"margin:0; padding:0; background-color:#F2EAE3; font-family:Arial, sans-serif;\">\n" +
+                            "    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:600px; margin:auto; background-color:#E7E2D6; padding:40px; border-radius:8px;\">\n" +
+                            "      <tr>\n" +
+                            "        <td>\n" +
+                            "          <h2 style=\"color:#0C052E; text-align:center;\">⏰ Suas tarefas atrasadas</h2>\n" +
+                            "          <p style=\"color:#0C4F64; font-size:16px;\">Olá você tem, " + responseTasks.getBody().size() + " tarefa(s) atrasada(s): \\n</p>\n" +
+                            "          <ul style=\"padding-left:20px; color:#0C052E;\">";
 
                     for (Task task : responseTasks.getBody()) {
-                        body = body + "Tarefa: " + task.nameTask() + " - " + task.descriptionTask() + "\n";
+                        body = body +
+                                "<li style=\"margin-bottom:10px;\">\n" +
+                                "   <strong>"+ task.nameTask() +"</strong><br />\n" +
+                                "   <span style=\"color:#E76148;\">Data da Tarefa: "+ task.dateTask() +"</span>\n" +
+                                "</li>";
                     }
+
+                    body = body + "</ul>\n" +
+                            "          <p style=\"margin-top:30px; font-size:14px; color:#B3AFA1;\">Organize-se e mantenha sua produtividade em dia \uD83D\uDCAA</p>\n" +
+                            "        </td>\n" +
+                            "      </tr>\n" +
+                            "    </table>\n" +
+                            "  </body>\n" +
+                            "</html>";
 
                     try {
                         emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
@@ -64,7 +88,24 @@ public class MotivationService {
                         throw new RuntimeException("ERROR: " + e.getMessage());
                     }
                 } else {
-                    body = "Olá você tem, 0 tarefa(s) atrasada(s), meus parabens!";
+                    body = "<!DOCTYPE html>\n" +
+                            "<html lang=\"pt-BR\">\n" +
+                            "  <head>\n" +
+                            "    <meta charset=\"UTF-8\" />\n" +
+                            "    <title>Tarefas Atrasadas</title>\n" +
+                            "  </head>\n" +
+                            "  <body style=\"margin:0; padding:0; background-color:#F2EAE3; font-family:Arial, sans-serif;\">\n" +
+                            "    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:600px; margin:auto; background-color:#E7E2D6; padding:40px; border-radius:8px;\">\n" +
+                            "      <tr>\n" +
+                            "        <td>\n" +
+                            "          <h2 style=\"color:#0C052E; text-align:center;\">⏰ Suas tarefas atrasadas</h2>\n" +
+                            "          <p style=\"color:#0C4F64; font-size:16px;\">Olá, Meus parabéns, você não tem nenhuma tarefa, atrasada!</p>\n" +
+                            "          <p style=\"margin-top:30px; font-size:14px; color:#B3AFA1;\">Organize-se e mantenha sua produtividade em dia \uD83D\uDCAA</p>\n" +
+                            "        </td>\n" +
+                            "      </tr>\n" +
+                            "    </table>\n" +
+                            "  </body>\n" +
+                            "</html>";
                     try {
                         emailClientService.sendEmail(new EmailRequest(user.email(), "Tarefas atrasadas", body));
                     } catch (Exception e) {
