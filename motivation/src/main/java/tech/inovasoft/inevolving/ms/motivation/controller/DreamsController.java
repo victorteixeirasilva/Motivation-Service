@@ -3,6 +3,7 @@ package tech.inovasoft.inevolving.ms.motivation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisio
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.TokenService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.dto.TokenValidateResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +29,9 @@ public class DreamsController {
     @Autowired
     private DreamsService service;
 
+    @Autowired
+    private TokenService tokenService;
+
     @Operation(summary = "Adicionar um novo sonho. | Add a new dream.", description = "Retorna o sonho cadastrado | Return the registered dream")
     @Async("asyncExecutor")
     @PostMapping("/{token}")
@@ -33,6 +39,23 @@ public class DreamsController {
             @RequestBody DreamRequestDTO dreamDTO,
             @PathVariable String token
     ) throws MaximumNumberOfRegisteredDreamsException, NotSavedDTOInDbException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.addDream(dreamDTO)
         ));
@@ -45,6 +68,23 @@ public class DreamsController {
             @RequestBody Dreams dreamDTO,
             @PathVariable String token
     ) throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.updateDream(dreamDTO)
         ));
@@ -57,6 +97,23 @@ public class DreamsController {
             @RequestBody RequestDeleteDream dto,
             @PathVariable String token
     ) throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException, DataBaseException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.deleteDream(dto.idDream(), dto.idUser())
         ));
@@ -69,6 +126,23 @@ public class DreamsController {
             @PathVariable UUID id,
             @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.getDreamsByUserId(id)
         ));
@@ -82,6 +156,23 @@ public class DreamsController {
             @PathVariable UUID idUser,
             @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.getDreamByID(idDream, idUser)
         ));
@@ -94,6 +185,23 @@ public class DreamsController {
             @PathVariable UUID idUser,
             @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException{
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.generateVisionBordByUserId(idUser)
         ));
