@@ -1,0 +1,106 @@
+name: Deploy Java Backend via SSH with Password
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Java 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Dar permissão ao mvnw
+        working-directory: motivation
+        run: chmod +x mvnw
+
+      - name: Build com Maven
+        working-directory: motivation
+        run: ./mvnw clean package
+
+      - name: Compactar pasta api
+        run: tar -cvf motivation.tar motivation/
+
+      - name: Instalar sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Enviar .tar para VPS
+        run: |
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" scp -o StrictHostKeyChecking=no motivation.tar ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/motivation.tar
+
+      - name: Executar comandos na VPS
+        run: |
+          TARGET_DIR="/home/root/Back-End/Motivation-Service"
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
+            set -e
+      
+            rm -rf "$TARGET_DIR/motivation"
+            mkdir -p "$TARGET_DIR"
+            tar -xvf /tmp/motivation.tar -C "$TARGET_DIR"
+            rm /tmp/motivation.tar
+      
+            cd "$TARGET_DIR/motivation"
+            docker-compose down --volumes --remove-orphans
+            docker-compose up --build -d
+      
+            echo "Containers ativos:"
+            docker ps
+          EOF
+
+      - name: Aguardar aplicação iniciar completamente
+        run: |
+          echo "⏳ Aguardando 60 segundos para garantir que a aplicação está pronta..."
+          sleep 60
+          echo "✅ Prosseguindo com os testes"
+
+      - name: Verificar deployment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+      
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "echo 'Containers ativos:' && docker ps"
+          
+      # - name: Instalar Newman e reporters
+      #   run: |
+      #     npm install -g newman
+      #     npm install -g newman-reporter-htmlextra
+
+      # - name: Executar testes da coleção Postman
+      #   run: |
+      #     newman run ${{ secrets.POSTMAN_COLLECTION_URL }} \
+      #       --environment ${{secrets.POSTMAN_ENVIRONMENT_URL}} \
+      #       --reporters cli,htmlextra,json \
+      #       --reporter-htmlextra-export newman-report.html \
+      #       --reporter-htmlextra-title "Gateway-Service API Tests" \
+      #       --reporter-json-export newman-results.json \
+      #       --bail \
+      #       --timeout-request 30000 \
+      #       --color on
+      #   continue-on-error: false
+
+      # - name: Upload dos resultados dos testes (HTML e JSON)
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: newman-test-results
+      #     path: |
+      #       newman-report.html
+      #       newman-results.json
+
+      # - name: Notificar falha nos testes
+      #   if: failure()
+      #   run: |
+      #     echo "❌ Os testes da API falharam após o deploy!"
+      #     echo "Verifique os logs acima para mais detalhes."
+      #     exit 1
