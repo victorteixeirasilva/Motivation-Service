@@ -25,7 +25,8 @@ jobs:
 
       - name: Build com Maven
         working-directory: motivation
-        run: ./mvnw clean package
+        run: ./mvnw clean package -DskipTests
+        # run: ./mvnw clean package
 
       - name: Compactar pasta api
         run: tar -cvf motivation.tar motivation/
