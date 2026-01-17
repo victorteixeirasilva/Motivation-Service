@@ -3,6 +3,7 @@ package tech.inovasoft.inevolving.ms.motivation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisio
 import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
 import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
 import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.TokenService;
+import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.dto.TokenValidateResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,12 +29,33 @@ public class DreamsController {
     @Autowired
     private DreamsService service;
 
+    @Autowired
+    private TokenService tokenService;
+
     @Operation(summary = "Adicionar um novo sonho. | Add a new dream.", description = "Retorna o sonho cadastrado | Return the registered dream")
     @Async("asyncExecutor")
-    @PostMapping
+    @PostMapping("/{token}")
     public CompletableFuture<ResponseEntity<Dreams>> addDream (
-            @RequestBody DreamRequestDTO dreamDTO
+            @RequestBody DreamRequestDTO dreamDTO,
+            @PathVariable String token
     ) throws MaximumNumberOfRegisteredDreamsException, NotSavedDTOInDbException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.addDream(dreamDTO)
         ));
@@ -39,10 +63,28 @@ public class DreamsController {
 
     @Operation(summary = "Editar um sonho. | Edit a dream.", description = "Retorna o sonho editado. | Returns the edited dream.")
     @Async("asyncExecutor")
-    @PutMapping
+    @PutMapping("/{token}")
     public CompletableFuture<ResponseEntity<Dreams>> updateDream (
-            @RequestBody Dreams dreamDTO
+            @RequestBody Dreams dreamDTO,
+            @PathVariable String token
     ) throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.updateDream(dreamDTO)
         ));
@@ -50,10 +92,28 @@ public class DreamsController {
 
     @Operation(summary = "Deletar um sonho. | Delete a dream.", description = "Retorna uma confirmação que o sonho foi deletado. | Returns a confirmation that the dream has been deleted.")
     @Async("asyncExecutor")
-    @DeleteMapping
+    @DeleteMapping("/{token}")
     public CompletableFuture<ResponseEntity<ResponseDeleteDream>> deleteDream (
-            @RequestBody RequestDeleteDream dto
+            @RequestBody RequestDeleteDream dto,
+            @PathVariable String token
     ) throws UserWithoutAuthorizationAboutThisDreamException, DreamNotFoundException, DataBaseException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.deleteDream(dto.idDream(), dto.idUser())
         ));
@@ -61,10 +121,28 @@ public class DreamsController {
 
     @Operation(summary = "Consultar Sonhos | Consult Dreams", description = "Retorna uma lista com todos os sonhos do usuário. | Returns a list of all the user's dreams.")
     @Async("asyncExecutor")
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{id}/{token}")
     public CompletableFuture<ResponseEntity<List<Dreams>>> getDreamsByUserId(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.getDreamsByUserId(id)
         ));
@@ -72,11 +150,29 @@ public class DreamsController {
 
     @Operation(summary = "Consultar Sonho | Consult Dream", description = "Retorna o sonho do usuário. | Returns the user's dream.")
     @Async("asyncExecutor")
-    @GetMapping("/{idDream}/{idUser}")
+    @GetMapping("/{idDream}/{idUser}/{token}")
     public CompletableFuture<ResponseEntity<Dreams>> getDreamByID(
             @PathVariable UUID idDream,
-            @PathVariable UUID idUser
+            @PathVariable UUID idUser,
+            @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException, UserWithoutAuthorizationAboutThisDreamException {
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.getDreamByID(idDream, idUser)
         ));
@@ -84,10 +180,28 @@ public class DreamsController {
 
     @Operation(summary = "Criar Vision Board | Create Vision Board", description = "Retorna uma url de um vision bord na amazon s3. | Returns a url of a vision board in amazon s3.")
     @Async("asyncExecutor")
-    @GetMapping("/visionbord/generate/{idUser}")
+    @GetMapping("/visionbord/generate/{idUser}/{token}")
     public CompletableFuture<ResponseEntity<ResponseVisionBord>> generateVisionBordByUserId(
-            @PathVariable UUID idUser
+            @PathVariable UUID idUser,
+            @PathVariable String token
     ) throws DataBaseException, DreamNotFoundException{
+        TokenValidateResponse tokenValidateResponse = null;
+
+        try {
+            tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(
                 service.generateVisionBordByUserId(idUser)
         ));
