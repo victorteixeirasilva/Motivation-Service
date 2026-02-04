@@ -194,7 +194,62 @@ public class MotivationService {
                     Random random = new Random();
                     int idexRandom = random.nextInt(dreams.size());
                     Dreams dream = dreams.get(idexRandom);
-                    body += "\nSonho: " + dream.getName() + " - " + dream.getDescription() + "\n";
+//                    body += "\nSonho: " + dream.getName() + " - " + dream.getDescription() + " - " + dream.getUrlImage() + "\n";
+                    body += "<!DOCTYPE html>\n" +
+                            "<html lang=\"pt-BR\">\n" +
+                            "<head>\n" +
+                            "  <meta charset=\"UTF-8\" />\n" +
+                            "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n" +
+                            "  <title>Seu Sonho do Dia</title>\n" +
+                            "</head>\n" +
+                            "\n" +
+                            "<body style=\"margin:0;padding:0;font-family:Arial,sans-serif;background-color:#f0f8ff;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;\">\n" +
+                            "  <div style=\"max-width:600px;margin:20px auto;background-color:#ffffff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);overflow:hidden;border:1px solid #e0e0e0;\">\n" +
+                            "\n" +
+                            "    <!-- Cabeçalho -->\n" +
+                            "    <div style=\"background-color:#6495ed;padding:25px 20px;text-align:center;color:#ffffff;border-bottom:1px solid #5a8be0;\">\n" +
+                            "      <h1 style=\"margin:0;font-size:28px;font-weight:bold;line-height:1.2;\">Seu Sonho do Dia</h1>\n" +
+                            "    </div>\n" +
+                            "\n" +
+                            "    <!-- Conteúdo -->\n" +
+                            "    <div style=\"padding:25px 20px;\">\n" +
+                            "\n" +
+                            "      <h2 style=\"font-size:24px;color:#2c3e50;margin-top:0;margin-bottom:15px;text-align:center;line-height:1.3;\">\n" +
+                            "        "+dream.getName()+"\n" +
+                            "      </h2>\n" +
+                            "\n" +
+                            "      <div style=\"margin-bottom:25px;text-align:center;\">\n" +
+                            "        <img src=\""+dream.getUrlImage()+"\" alt=\"Imagem do Sonho\" style=\"max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;border:1px solid #dcdcdc;\" />\n" +
+                            "      </div>\n" +
+                            "\n" +
+                            "      <p style=\"font-size:16px;line-height:1.6;color:#333333;margin:0 0 24px 0;text-align:justify;\">\n" +
+                            "        "+dream.getDescription()+"\n" +
+                            "      </p>\n" +
+                            "\n" +
+                            "      <!-- Botão -->\n" +
+                            "      <div style=\"text-align:center;margin:0 0 10px 0;\">\n" +
+                            "        <a href=\"https://inevolving.inovasoft.tech/\" target=\"_blank\"\n" +
+                            "           style=\"display:inline-block;background-color:#2f6fed;color:#ffffff;text-decoration:none;padding:14px 22px;border-radius:10px;font-size:16px;font-weight:bold;\">\n" +
+                            "          Entrar no sistema\n" +
+                            "        </a>\n" +
+                            "      </div>\n" +
+                            "\n" +
+                            "      <!-- Link fallback (bom para email) -->\n" +
+                            "      <p style=\"font-size:12px;line-height:1.4;color:#666666;margin:10px 0 0 0;text-align:center;\">\n" +
+                            "        Se o botão não funcionar, copie e cole este link no navegador:<br/>\n" +
+                            "        <span style=\"color:#2f6fed;\">https://inevolving.inovasoft.tech/</span>\n" +
+                            "      </p>\n" +
+                            "\n" +
+                            "    </div>\n" +
+                            "\n" +
+                            "    <!-- Rodapé -->\n" +
+                            "    <div style=\"background-color:#f8f8f8;padding:15px 20px;text-align:center;font-size:12px;color:#777777;border-top:1px solid #e0e0e0;\">\n" +
+                            "      <p style=\"margin:0;\">&copy; 2026 Inovasoft. Todos os direitos reservados.</p>\n" +
+                            "    </div>\n" +
+                            "\n" +
+                            "  </div>\n" +
+                            "</body>\n" +
+                            "</html>";
 
                     try {
                         emailClientService.sendEmail(new EmailRequest(user.email(), "Sentimos a sua falta! seus sonhos te esperam!", body), getValidTokenEmail());
