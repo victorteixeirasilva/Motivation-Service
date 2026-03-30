@@ -1,6 +1,7 @@
 # Motivation Service - Microserviço de Engajamento e Performance Pessoal
 
 **Converta metas esquecidas em ação diária com automações inteligentes de motivação, visão de futuro e retenção de usuários.**
+<img width="1536" height="1024" alt="Generatedimage_1774911040453" src="https://github.com/user-attachments/assets/873ca648-984d-42ff-93d6-1b6eb5afa5c6" />
 
 ## Introdução e Visão Geral
 
