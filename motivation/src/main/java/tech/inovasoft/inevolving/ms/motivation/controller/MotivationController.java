@@ -7,20 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
-import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.DreamRequestDTO;
-import tech.inovasoft.inevolving.ms.motivation.domain.dto.request.RequestDeleteDream;
+import tech.inovasoft.inevolving.ms.motivation.config.SchedulingConfig;
 import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.MessageResponseDTO;
-import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseDeleteDream;
-import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseVisionBord;
-import tech.inovasoft.inevolving.ms.motivation.domain.exception.*;
-import tech.inovasoft.inevolving.ms.motivation.domain.model.Dreams;
-import tech.inovasoft.inevolving.ms.motivation.service.DreamsService;
+import tech.inovasoft.inevolving.ms.motivation.domain.dto.response.ResponseAgendamentosDTO;
 import tech.inovasoft.inevolving.ms.motivation.service.MotivationService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.TokenService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.Auth_For_MService.dto.TokenValidateResponse;
 
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Motivation")
@@ -33,6 +26,9 @@ public class MotivationController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private SchedulingConfig schedulingConfig;
 
     @Operation(description = "Envia email motivacional para todos os usuários, com suas tarefas atrasadas")
     @Async("asyncExecutor")
@@ -90,5 +86,30 @@ public class MotivationController {
         ));
     }
 
+    @Operation(description = "Força o reagendamento dos emails motivacionais e retorna os agendamentos gerados para o dia.")
+    @Async("asyncExecutor")
+    @GetMapping("/scheduling/force/{token}")
+    public CompletableFuture<ResponseEntity<ResponseAgendamentosDTO>> forcarReagendamento(
+        @PathVariable String token
+    ) {
+        try {
+            TokenValidateResponse tokenValidateResponse = tokenService.validateToken(token);
+            if (tokenValidateResponse == null) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals("Invalid token")) {
+                return CompletableFuture.completedFuture(ResponseEntity.status(
+                        HttpStatus.UNAUTHORIZED
+                ).build());
+            }
+        }
+
+        return CompletableFuture.completedFuture(ResponseEntity.ok(
+                schedulingConfig.forcarReagendamento()
+        ));
+    }
 
 }
