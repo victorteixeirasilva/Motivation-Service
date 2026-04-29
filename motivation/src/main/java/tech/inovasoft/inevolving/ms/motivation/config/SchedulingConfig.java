@@ -55,7 +55,29 @@ public class SchedulingConfig {
     }
 
     public synchronized ResponseAgendamentosDTO forcarReagendamento() {
-        scheduleTodaysEmails();
+        scheduledFutures.forEach(f -> f.cancel(false));
+        scheduledFutures.clear();
+        currentScheduledTimes.clear();
+
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        ZonedDateTime windowEnd = now.toLocalDate().atTime(19, 0).atZone(zoneId);
+
+        LocalDate targetDate = now.isAfter(windowEnd) ? now.toLocalDate().plusDays(1) : now.toLocalDate();
+        ZonedDateTime windowStart = targetDate.atTime(7, 0).atZone(zoneId);
+        ZonedDateTime effectiveAfter = now.isAfter(windowEnd) ? windowStart : now;
+
+        List<ZonedDateTime> times = generateRandomTimes(targetDate, effectiveAfter);
+        long nowMs = now.toInstant().toEpochMilli();
+
+        for (ZonedDateTime time : times) {
+            long delay = time.toInstant().toEpochMilli() - nowMs;
+            if (delay > 0) {
+                ScheduledFuture<?> future = executor.schedule(sendEmailRunnable, delay, TimeUnit.MILLISECONDS);
+                scheduledFutures.add(future);
+                currentScheduledTimes.add(time);
+            }
+        }
+
         return buildResponseAgendamentos();
     }
 
