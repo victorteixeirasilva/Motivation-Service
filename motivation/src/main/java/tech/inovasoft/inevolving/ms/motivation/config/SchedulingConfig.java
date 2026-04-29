@@ -135,7 +135,7 @@ public class SchedulingConfig {
         long startMs = effectiveStart.toInstant().toEpochMilli();
         long endMs = windowEnd.toInstant().toEpochMilli();
         long durationMs = endMs - startMs;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
             double randFraction = random.nextDouble();
             long randomDelayMs = (long) (randFraction * durationMs);
             ZonedDateTime randomTime = effectiveStart.plus(randomDelayMs, ChronoUnit.MILLIS);
