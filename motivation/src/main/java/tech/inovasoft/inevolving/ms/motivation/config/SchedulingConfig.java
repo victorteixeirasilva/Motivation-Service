@@ -43,6 +43,11 @@ public class SchedulingConfig {
         motivationService.sendEmailForUsersDisconnected();
     }
 
+    @Scheduled(cron = "0 50 23 * * *", zone = "America/Sao_Paulo")
+    public void postponeTasksForAllUsers() {
+        motivationService.postponeTasksForAllUsers();
+    }
+
     public void sendEmailMotivacionalForUsers() {
         motivationService.sendEmailForUsersDisconnected();
     }

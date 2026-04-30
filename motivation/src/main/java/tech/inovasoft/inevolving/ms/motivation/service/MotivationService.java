@@ -15,6 +15,10 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.dto.
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.TasksClientService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.Task;
 
+import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.PostponeDayRequestDTO;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
 
@@ -58,6 +62,45 @@ public class MotivationService {
             cachedTokenEmail = tokenCache.getToken(EMAIL_SERVICE);
         }
         return cachedTokenEmail;
+    }
+
+    public MessageResponseDTO postponeTasksForAllUsers() {
+        ResponseEntity<List<UserEmailDTO>> responseUsers;
+
+        try {
+            responseUsers = apiClientService.getUsersIsVerifiedAndActive(getValidTokenGateway());
+        } catch (FeignException.Unauthorized unauthorized) {
+            cachedTokenGateway = null;
+            return postponeTasksForAllUsers();
+        } catch (Exception e) {
+            return new MessageResponseDTO("Erro em getUsersIsVerifiedAndActive: " + e.getMessage());
+        }
+
+        if (responseUsers.getStatusCode().is2xxSuccessful() && responseUsers.getBody() != null) {
+            String referenceDay = LocalDate.now(ZoneId.of("America/Sao_Paulo")).toString();
+            int erros = 0;
+
+            for (UserEmailDTO user : responseUsers.getBody()) {
+                try {
+                    tasksClientService.postponeDay(
+                            getValidTokenTasks(),
+                            new PostponeDayRequestDTO(user.id(), referenceDay)
+                    );
+                } catch (FeignException.Unauthorized unauthorized) {
+                    cachedTokenTasks = null;
+                    return postponeTasksForAllUsers();
+                } catch (Exception e) {
+                    erros++;
+                }
+            }
+
+            if (erros > 0) {
+                return new MessageResponseDTO("Adiamento concluído com " + erros + " erro(s)");
+            }
+            return new MessageResponseDTO("Tarefas do dia " + referenceDay + " adiadas com sucesso para todos os usuários");
+        } else {
+            return new MessageResponseDTO("Erro ao buscar usuários ativos");
+        }
     }
 
     public MessageResponseDTO sendEmailForUsersWithLateTasks() {
