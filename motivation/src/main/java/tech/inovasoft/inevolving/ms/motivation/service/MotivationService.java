@@ -211,7 +211,7 @@ public class MotivationService {
         ResponseEntity<List<UserEmailDTO>> responseUsers;
 
         try {
-            responseUsers = apiClientService.getUsersIsVerifiedAndActive(getValidTokenGateway());
+            responseUsers = apiClientService.getUsersDisconnectedAndActive(getValidTokenGateway());
         } catch (FeignException.Unauthorized unauthorized) {
             cachedTokenGateway = null;
             return sendEmailForUsersDisconnected();
