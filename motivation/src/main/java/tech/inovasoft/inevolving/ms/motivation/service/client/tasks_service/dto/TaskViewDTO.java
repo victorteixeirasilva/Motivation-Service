@@ -1,14 +1,15 @@
 package tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record Task(
+public record TaskViewDTO(
         UUID id,
         String nameTask,
         String descriptionTask,
         String status,
-        Date dateTask,
+        LocalDate dateTask,
         UUID idObjective,
         UUID idUser,
         UUID idParentTask,
@@ -16,6 +17,11 @@ public record Task(
         Boolean hasSubtasks,
         Boolean blockedByObjective,
         Boolean isCopy,
-        String cancellationReason
+        String cancellationReason,
+        UUID idResponsibleUser,
+        OffsetDateTime createdAt,
+        OffsetDateTime inProgressAt,
+        OffsetDateTime completedAt,
+        OffsetDateTime cancelledAt
 ) {
 }

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.dto.EmailRequest;
-import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.Task;
 
 import java.util.List;
 import java.util.UUID;

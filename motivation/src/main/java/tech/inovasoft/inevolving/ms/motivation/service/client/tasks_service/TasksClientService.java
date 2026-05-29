@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.PostponeDayRequestDTO;
-import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.Task;
+import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.TaskViewDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,9 +17,10 @@ import java.util.UUID;
 public interface TasksClientService {
 
     @GetMapping("/late/{idUser}/{token}")
-    ResponseEntity<List<Task>> getTasksLate(
+    ResponseEntity<List<TaskViewDTO>> getTasksLate(
             @PathVariable UUID idUser,
-            @PathVariable String token
+            @PathVariable String token,
+            @RequestHeader(TasksServiceConstants.USER_TIMEZONE_HEADER) String userTimezone
     );
 
     @PostMapping("/date/postpone-day/{token}")

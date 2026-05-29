@@ -13,9 +13,9 @@ import tech.inovasoft.inevolving.ms.motivation.service.client.api.dto.UserEmailD
 import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.EmailClientService;
 import tech.inovasoft.inevolving.ms.motivation.service.client.email_service.dto.EmailRequest;
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.TasksClientService;
-import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.Task;
-
+import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.TasksServiceConstants;
 import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.PostponeDayRequestDTO;
+import tech.inovasoft.inevolving.ms.motivation.service.client.tasks_service.dto.TaskViewDTO;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -77,7 +77,7 @@ public class MotivationService {
         }
 
         if (responseUsers.getStatusCode().is2xxSuccessful() && responseUsers.getBody() != null) {
-            String referenceDay = LocalDate.now(ZoneId.of("America/Sao_Paulo")).toString();
+            String referenceDay = LocalDate.now(ZoneId.of(TasksServiceConstants.DEFAULT_TIMEZONE)).toString();
             int erros = 0;
 
             for (UserEmailDTO user : responseUsers.getBody()) {
@@ -117,10 +117,14 @@ public class MotivationService {
 
         if (responseUsers.getStatusCode().is2xxSuccessful() && responseUsers.getBody() != null) {
             for (UserEmailDTO user : responseUsers.getBody()) {
-                ResponseEntity<List<Task>> responseTasks;
+                ResponseEntity<List<TaskViewDTO>> responseTasks;
 
                 try {
-                    responseTasks = tasksClientService.getTasksLate(user.id(), getValidTokenTasks());
+                    responseTasks = tasksClientService.getTasksLate(
+                            user.id(),
+                            getValidTokenTasks(),
+                            TasksServiceConstants.DEFAULT_TIMEZONE
+                    );
                 } catch (FeignException.Unauthorized unauthorized) {
                     cachedTokenTasks = null;
                     return sendEmailForUsersWithLateTasks();
@@ -146,7 +150,7 @@ public class MotivationService {
                             "          <p style=\"color:#0C4F64; font-size:16px;\">Olá você tem, " + responseTasks.getBody().size() + " tarefa(s) atrasada(s): \\n</p>\n" +
                             "          <ul style=\"padding-left:20px; color:#0C052E;\">";
 
-                    for (Task task : responseTasks.getBody()) {
+                    for (TaskViewDTO task : responseTasks.getBody()) {
                         body = body +
                                 "<li style=\"margin-bottom:10px;\">\n" +
                                 "   <strong>"+ task.nameTask() +"</strong><br />\n" +
